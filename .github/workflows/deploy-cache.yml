@@ -2,8 +2,8 @@ name: Deploy cache worker
 
 on:
   push:
-    branches:
-      - master
+    paths:
+      - 'cache/**'
 
 jobs:
   deploy:
@@ -18,4 +18,3 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           workingDirectory: 'cache'
-          environment: 'production'
