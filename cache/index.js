@@ -80,6 +80,8 @@ async function getOrigin(event, request, cache, cacheRequest, cacheUrl) {
       event.waitUntil(cache.put(cacheRequest, originResponse.clone()))
 
       return originResponse
+    } else {
+      return originResponse
     }
   } catch (err) {
     return new Response(err.stack || err)
