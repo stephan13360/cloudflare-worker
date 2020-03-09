@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "cache",
+  "version": "1.0.0",
+  "description": "Cache html and assets on cloudflare with the workers cache api",
+  "main": "index.js",
+  "author": "Stephan Herbers <stephan@sherbers.de>",
+  "license": "MIT"
+}
