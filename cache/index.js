@@ -41,8 +41,8 @@ async function handleRequest(event) {
     )
     event.waitUntil(originResponse)
 
-    let response = await cache.match(cacheRequest)
     // Use cache response when available, otherwise use origin response
+    let response = await cache.match(cacheRequest)
     if (!response) response = await originResponse
 
     // Send Logs to Elasticsearch
