@@ -44,6 +44,10 @@ async function handleRequest(event) {
     let response = await cache.match(cacheRequest)
     // Use cache response when available, otherwise use origin response
     if (!response) response = await originResponse
+
+    // Send Logs to Elasticsearch
+    event.waitUntil(logToES(request, response));
+
     return response
   } catch (err) {
     return new Response(err.stack || err)
@@ -53,7 +57,7 @@ async function handleRequest(event) {
 async function removeCampaignQueries(url) {
   let deleteKeys = []
 
-  for (var key of url.searchParams.keys()) {
+  for (let key of url.searchParams.keys()) {
     if (key.match(TRACKING_QUERY)) {
       deleteKeys.push(key)
     }
@@ -86,6 +90,35 @@ async function getOrigin(event, request, cache, cacheRequest, cacheUrl) {
   } catch (err) {
     return new Response(err.stack || err)
   }
+}
+
+async function logToES(request, response) {
+  let ray = request.headers.get('cf-ray') || '';
+  let id = ray.slice(0, -4);
+  let data = {
+    'timestamp': Date.now(),
+    'url': request.url,
+    'referer': request.referrer,
+    'method': request.method,
+    'ray': ray,
+    'ip': request.headers.get('cf-connecting-ip') || '',
+    'host': request.headers.get('host') || '',
+    'user-agent': request.headers.get('user-agent') || '',
+    'country': request.headers.get('Cf-Ipcountry') || '',
+    'colo': request.cf.colo,
+    'status': response.status,
+  };
+
+  let url = "https://elasticsearch.sherbers.de/cloudflare/_doc/" + id
+  let auth = "Basic " + SECRET_ES_BASIC_AUTH
+  await fetch(url, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': auth
+    })
+  })
 }
 
 function checkBypassCache(request) {
