@@ -12,11 +12,11 @@ const TRACKING_QUERY = new RegExp(
 
 addEventListener('fetch', event => {
   try {
-    // let request = event.request
-    // // bypass cache on POST requests
-    // if (request.method.toUpperCase() === 'POST') return
-    // // bypass cache specific cookies, urls, or query parameter
-    // if (checkBypassCache(request)) return
+    let request = event.request
+    // bypass cache on POST requests
+    if (request.method.toUpperCase() === 'POST') return
+    // bypass cache specific cookies, urls, or query parameter
+    if (checkBypassCache(request)) return
     return event.respondWith(handleRequest(event))
   } catch (err) {
     return new Response(err.stack || err)
@@ -76,7 +76,7 @@ async function getOrigin(event, request, cache, cacheRequest, cacheUrl) {
     // must use Response constructor to inherit all of response's fields
     originResponse = new Response(originResponse.body, originResponse)
 
-    if (CACHE_ON_STATUS.includes(originResponse.status) && request.method.toUpperCase() !== 'POST' && !checkBypassCache(request)) {
+    if (CACHE_ON_STATUS.includes(originResponse.status)) {
       // Delete cookie header so HTML can be cached
       originResponse.headers.delete('Set-Cookie')
 
