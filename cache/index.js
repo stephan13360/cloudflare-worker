@@ -36,8 +36,7 @@ async function handleRequest(event) {
       event,
       request,
       cache,
-      cacheRequest,
-      cacheUrl,
+      cacheRequest
     )
     event.waitUntil(originResponse)
 
@@ -68,7 +67,7 @@ async function removeCampaignQueries(url) {
   return url
 }
 
-async function getOrigin(event, request, cache, cacheRequest, cacheUrl) {
+async function getOrigin(event, request, cache, cacheRequest) {
   try {
     // Get response from orign
     originResponse = await fetch(request)
