@@ -53,20 +53,6 @@ async function handleRequest(event) {
   }
 }
 
-async function removeCampaignQueries(url) {
-  let deleteKeys = []
-
-  for (let key of url.searchParams.keys()) {
-    if (key.match(TRACKING_QUERY)) {
-      deleteKeys.push(key)
-    }
-  }
-
-  deleteKeys.map(k => url.searchParams.delete(k))
-
-  return url
-}
-
 async function getOrigin(event, request, cache, cacheRequest) {
   try {
     // Get response from orign
@@ -89,6 +75,20 @@ async function getOrigin(event, request, cache, cacheRequest) {
   } catch (err) {
     return new Response(err.stack || err)
   }
+}
+
+async function removeCampaignQueries(url) {
+  let deleteKeys = []
+
+  for (let key of url.searchParams.keys()) {
+    if (key.match(TRACKING_QUERY)) {
+      deleteKeys.push(key)
+    }
+  }
+
+  deleteKeys.map(k => url.searchParams.delete(k))
+
+  return url
 }
 
 async function logToES(request, response) {
