@@ -105,8 +105,7 @@ async function logToES(request, response) {
     'host': request.headers.get('host') || '',
     'user-agent': request.headers.get('user-agent') || '',
     'country': request.headers.get('Cf-Ipcountry') || '',
-    'colo': request.cf.colo,
-    'status': response.status,
+    'status': response.status
   };
 
   let url = "https://elasticsearch.sherbers.de/cloudflare/_doc/" + id
