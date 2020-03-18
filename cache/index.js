@@ -26,8 +26,8 @@ async function handleRequest(event) {
     let cacheRequest = new Request(cacheUrl, request);
     let cache = caches.default;
 
-    // Get response from origin and update the cache
-    let originResponse = getOrigin(event, request, cache, cacheRequest);
+    // Get response from origin
+    let originResponse = getOrigin(request);
     event.waitUntil(originResponse);
 
     // bypass cache on POST requests and specific cookies, urls, or query parameter
@@ -43,6 +43,15 @@ async function handleRequest(event) {
       let response = await cache.match(cacheRequest);
       if (!response) response = await originResponse;
 
+      // cache response on certain status codes
+      if (CACHE_ON_STATUS.includes(originResponse.status)) {
+        // Delete cookie header so HTML can be cached
+        response.headers.delete("Set-Cookie");
+
+        // waitUntil runs even after response has been sent
+        event.waitUntil(cache.put(cacheRequest, response.clone()));
+      }
+
       // Send Logs to Elasticsearch
       event.waitUntil(logToES(request, response));
 
@@ -53,7 +62,7 @@ async function handleRequest(event) {
   }
 }
 
-async function getOrigin(event, request, cache, cacheRequest) {
+async function getOrigin(request) {
   try {
     // Get response from orign
     originResponse = await fetch(request);
@@ -61,17 +70,7 @@ async function getOrigin(event, request, cache, cacheRequest) {
     // must use Response constructor to inherit all of response's fields
     originResponse = new Response(originResponse.body, originResponse);
 
-    if (CACHE_ON_STATUS.includes(originResponse.status)) {
-      // Delete cookie header so HTML can be cached
-      originResponse.headers.delete("Set-Cookie");
-
-      // waitUntil runs even after response has been sent
-      event.waitUntil(cache.put(cacheRequest, originResponse.clone()));
-
-      return originResponse;
-    } else {
-      return originResponse;
-    }
+    return originResponse;
   } catch (err) {
     return new Response(err.stack || err);
   }
