@@ -12,11 +12,6 @@ const TRACKING_QUERY = new RegExp(
 
 addEventListener("fetch", event => {
   try {
-    let request = event.request;
-    // bypass cache on POST requests
-    if (request.method.toUpperCase() === "POST") return;
-    // bypass cache specific cookies, urls, or query parameter
-    if (checkBypassCache(request)) return;
     return event.respondWith(handleRequest(event));
   } catch (err) {
     return new Response(err.stack || err);
@@ -35,14 +30,24 @@ async function handleRequest(event) {
     let originResponse = getOrigin(event, request, cache, cacheRequest);
     event.waitUntil(originResponse);
 
-    // Use cache response when available, otherwise use origin response
-    let response = await cache.match(cacheRequest);
-    if (!response) response = await originResponse;
+    // bypass cache on POST requests and specific cookies, urls, or query parameter
+    if (request.method.toUpperCase() === "POST" || checkBypassCache(request)) {
+      let response = await originResponse;
 
-    // Send Logs to Elasticsearch
-    event.waitUntil(logToES(request, response));
+      // Send Logs to Elasticsearch
+      event.waitUntil(logToES(request, response));
 
-    return response;
+      return response;
+    } else {
+      // Use cache response when available, otherwise use origin response
+      let response = await cache.match(cacheRequest);
+      if (!response) response = await originResponse;
+
+      // Send Logs to Elasticsearch
+      event.waitUntil(logToES(request, response));
+
+      return response;
+    }
   } catch (err) {
     return new Response(err.stack || err);
   }
