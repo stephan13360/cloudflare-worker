@@ -1,6 +1,6 @@
-const BYPASS_COOKIES = ["DW", "ttrss_sid"];
+const BYPASS_COOKIES = ["ghost-admin-api-session"];
 
-const BYPASS_URI = [];
+const BYPASS_URI = ["/ghost/"];
 
 const BYPASS_QUERY = [];
 
