@@ -13,6 +13,7 @@ const TRACKING_QUERY = new RegExp(
 addEventListener("fetch", event => {
   try {
     let request = event.request;
+
     // bypass cache on POST requests
     if (request.method.toUpperCase() === "POST") return;
     // bypass cache specific cookies, urls, or query parameter
@@ -69,12 +70,21 @@ async function getOrigin(event, request, cache, cacheRequest, cacheUrl) {
     // Get response from orign
     originResponse = await fetch(request);
 
+    // use normal cloudflare cache for non html files
+    if (!originResponse.headers?.get("Content-Type")?.includes("text/html")) return originResponse;
+
     // must use Response constructor to inherit all of response's fields
     originResponse = new Response(originResponse.body, originResponse);
 
     if (CACHE_ON_STATUS.includes(originResponse.status)) {
       // Delete cookie header so HTML can be cached
       originResponse.headers.delete("Set-Cookie");
+
+      // Overwrite Cache-Control header so HTML can be cached
+      originResponse.headers.set(
+        "Cache-Control",
+        "public, s-maxage=604800, max-age=0"
+      );
 
       // waitUntil runs even after response has been sent
       event.waitUntil(cache.put(cacheRequest, originResponse.clone()));
