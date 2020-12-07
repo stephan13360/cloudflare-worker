@@ -10,10 +10,9 @@ const TRACKING_QUERY = new RegExp(
   "(gclid|utm_(source|campaign|medium)|fb(cl)?id|fbclid)"
 );
 
-addEventListener("fetch", event => {
+addEventListener("fetch", (event) => {
   try {
     let request = event.request;
-
     // bypass cache on POST requests
     if (request.method.toUpperCase() === "POST") return;
     // bypass cache specific cookies, urls, or query parameter
@@ -60,7 +59,7 @@ async function removeCampaignQueries(url) {
     }
   }
 
-  deleteKeys.map(k => url.searchParams.delete(k));
+  deleteKeys.map((k) => url.searchParams.delete(k));
 
   return url;
 }
@@ -71,7 +70,8 @@ async function getOrigin(event, request, cache, cacheRequest, cacheUrl) {
     originResponse = await fetch(request);
 
     // use normal cloudflare cache for non html files
-    if (!originResponse.headers?.get("Content-Type")?.includes("text/html")) return originResponse;
+    if (!originResponse.headers?.get("Content-Type")?.includes("text/html"))
+      return originResponse;
 
     // must use Response constructor to inherit all of response's fields
     originResponse = new Response(originResponse.body, originResponse);
