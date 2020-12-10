@@ -1,4 +1,4 @@
-const BYPASS_COOKIES = ["ghost-admin-api-session"];
+const BYPASS_COOKIES = ["no-worker-cache", "ghost-admin-api-session"];
 
 const BYPASS_URI = ["/ghost/"];
 
