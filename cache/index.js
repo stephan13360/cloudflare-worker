@@ -15,7 +15,7 @@ addEventListener("fetch", (event) => {
     let request = event.request;
     // bypass cache on POST requests
     if (request.method.toUpperCase() === "POST") return;
-    // bypass cache specific cookies, urls, or query parameter
+    // bypass cache on specific cookies, url paths, or query parameters
     if (checkBypassCache(request)) return;
     return event.respondWith(handleRequest(event));
   } catch (err) {
@@ -27,6 +27,7 @@ async function handleRequest(event) {
   try {
     let request = event.request;
     let cacheUrl = new URL(request.url);
+    // remove tracking query parameters to increase cache hit ratio
     cacheUrl = await removeCampaignQueries(cacheUrl);
     let cacheRequest = new Request(cacheUrl, request);
     let cache = caches.default;
@@ -39,8 +40,10 @@ async function handleRequest(event) {
       cacheRequest,
       cacheUrl
     );
+    // don't stop the worker before the origin request finishes and is cached
     event.waitUntil(originResponse);
 
+    // check if url is already cached
     let response = await cache.match(cacheRequest);
     // Use cache response when available, otherwise use origin response
     if (!response) response = await originResponse;
