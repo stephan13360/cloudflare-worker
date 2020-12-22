@@ -1,6 +1,6 @@
 const BYPASS_COOKIES = ["no_worker_cache=true", "ghost-admin-api-session"];
 
-const BYPASS_URI = ["/ghost/"];
+const BYPASS_PATH = ["/ghost/"];
 
 const BYPASS_QUERY = [];
 
@@ -114,9 +114,9 @@ function checkBypassCache(request) {
       }
     }
 
-    if (BYPASS_URI.length) {
+    if (BYPASS_PATH.length) {
       let url = new URL(request.url);
-      for (let uri of BYPASS_URI) {
+      for (let uri of BYPASS_PATH) {
         if (url.pathname.includes(uri)) {
           return true;
         }
