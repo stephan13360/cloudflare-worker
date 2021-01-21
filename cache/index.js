@@ -4,7 +4,7 @@ const BYPASS_PATH = ["/ghost/"];
 
 const BYPASS_QUERY = [];
 
-const CACHE_ON_STATUS = [200, 301, 302, 307, 404];
+const CACHE_ON_STATUS = [200, 301, 302, 303, 307, 404];
 
 const TRACKING_QUERY = new RegExp(
   "(gclid|utm_(source|campaign|medium)|fb(cl)?id|fbclid)"
