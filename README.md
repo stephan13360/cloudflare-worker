@@ -1,6 +1,6 @@
 # Cloudflare Worker
 
-This is a collection of cloudflare worker I created.
+This is a collection of cloudflare workers I created.
 
 ## cache
 
