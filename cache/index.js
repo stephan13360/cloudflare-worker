@@ -33,13 +33,7 @@ async function handleRequest(event) {
     let cache = caches.default;
 
     // Get response from origin and update the cache
-    let originResponse = getOrigin(
-      event,
-      request,
-      cache,
-      cacheRequest,
-      cacheUrl
-    );
+    let originResponse = getOrigin(event, request, cache, cacheRequest);
     // don't stop the worker before the origin request finishes and is cached
     event.waitUntil(originResponse);
 
