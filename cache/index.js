@@ -64,7 +64,7 @@ async function removeCampaignQueries(url) {
 async function getOrigin(event, request, cache, cacheRequest) {
   try {
     // Get response from orign
-    originResponse = await fetch(request);
+    let originResponse = await fetch(request);
 
     // use normal cloudflare cache for non html files
     if (!originResponse.headers?.get("Content-Type")?.includes("text/html"))
