@@ -58,7 +58,7 @@ async function removeCampaignQueries(url) {
     }
   }
 
-  deleteKeys.map((k) => url.searchParams.delete(k));
+  deleteKeys.forEach((k) => url.searchParams.delete(k));
 
   return url;
 }
