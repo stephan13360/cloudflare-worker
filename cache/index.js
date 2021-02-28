@@ -16,7 +16,9 @@ addEventListener("fetch", (event) => {
     // bypass cache on POST requests
     if (request.method.toUpperCase() === "POST") return;
     // bypass cache on specific cookies, url paths, or query parameters
-    if (checkBypassCache(request)) return;
+    if (checkBypassCookie(request)) return;
+    if (checkBypassPath(request)) return;
+    if (checkBypassQuery(request)) return;
     return event.respondWith(handleRequest(event));
   } catch (err) {
     return new Response(err.stack || err);
@@ -95,7 +97,7 @@ async function getOrigin(event, request, cache, cacheRequest) {
   }
 }
 
-function checkBypassCache(request) {
+function checkBypassCookie(request) {
   try {
     if (BYPASS_COOKIES.length) {
       const cookieHeader = request.headers.get("cookie");
@@ -111,6 +113,14 @@ function checkBypassCache(request) {
       }
     }
 
+    return false;
+  } catch (err) {
+    return new Response(err.stack || err);
+  }
+}
+
+function checkBypassPath(request) {
+  try {
     if (BYPASS_PATH.length) {
       let url = new URL(request.url);
       for (let uri of BYPASS_PATH) {
@@ -120,6 +130,14 @@ function checkBypassCache(request) {
       }
     }
 
+    return false;
+  } catch (err) {
+    return new Response(err.stack || err);
+  }
+}
+
+function checkBypassQuery(request) {
+  try {
     if (BYPASS_QUERY.length) {
       let url = new URL(request.url);
       for (let query of BYPASS_QUERY) {
